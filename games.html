@@ -1,4 +1,3 @@
-
 <!DOCTYPE html>
 <html lang="ar" dir="rtl">
 <head>
@@ -7,7 +6,9 @@
   <link rel="stylesheet" href="style.css">
   <style>
     body {
-      background-color: #222;
+      background-image: url('https://images.unsplash.com/photo-1549921296-3a6b5a4b1b9b');
+      background-size: cover;
+      background-position: center;
       color: white;
       font-family: 'Arial', sans-serif;
       text-align: center;
@@ -22,7 +23,7 @@
     .slot {
       width: 100px;
       height: 100px;
-      background-color: #000;
+      background-color: rgba(0,0,0,0.7);
       border: 3px solid gold;
       border-radius: 10px;
       font-size: 60px;
@@ -30,6 +31,7 @@
       align-items: center;
       justify-content: center;
       animation: spin 0.5s ease;
+      box-shadow: 0 0 20px gold;
     }
     @keyframes spin {
       0% { transform: scale(1); }
@@ -44,6 +46,7 @@
       background-color: gold;
       border: none;
       border-radius: 8px;
+      color: black;
     }
     #result {
       font-size: 24px;
@@ -54,19 +57,37 @@
       font-size: 20px;
       margin-top: 10px;
     }
-    #home {
-      margin-top: 40px;
+    #home, #reset {
+      margin-top: 30px;
       display: inline-block;
       font-size: 18px;
       color: #00f;
       text-decoration: underline;
+      margin-right: 20px;
+    }
+    #controls {
+      margin-top: 20px;
+    }
+    select {
+      font-size: 18px;
+      padding: 5px;
     }
   </style>
 </head>
 <body>
   <h1>🎰 ماكينة الحظ الكبرى</h1>
-  <p>اضغط لتدوير الرموز. إذا تطابقت الثلاثة، تربح 10 عملات!</p>
+  <p>اختر مبلغ الرهان واضغط لتدوير الرموز. إذا تطابقت الثلاثة، تربح!</p>
+
   <div id="coins">💰 رصيدك: <span id="coinCount">100</span> عملة</div>
+
+  <div id="controls">
+    <label>💸 مبلغ الرهان:</label>
+    <select id="betAmount">
+      <option value="5">5 عملات</option>
+      <option value="10">10 عملات</option>
+      <option value="20">20 عملة</option>
+    </select>
+  </div>
 
   <div class="slot-container">
     <div class="slot" id="slot1">🍒</div>
@@ -77,10 +98,14 @@
   <button onclick="spin()">🎯 تدوير</button>
   <div id="result"></div>
 
-  <a id="home" href="index.html">🏠 العودة إلى الرئيسية</a>
+  <div>
+    <a id="home" href="index.html">🏠 العودة إلى الرئيسية</a>
+    <a id="reset" href="#" onclick="resetGame()">🔄 إعادة اللعبة</a>
+  </div>
 
   <audio id="winSound" src="https://cdn.pixabay.com/download/audio/2022/03/15/audio_3f6b7b1e4e.mp3?filename=success-1-6297.mp3"></audio>
   <audio id="loseSound" src="https://cdn.pixabay.com/download/audio/2022/03/15/audio_3f6b7b1e4e.mp3?filename=fail-1-6298.mp3"></audio>
+  <audio id="bgMusic" src="https://cdn.pixabay.com/download/audio/2022/03/15/audio_3f6b7b1e4e.mp3?filename=casino-theme.mp3" autoplay loop></audio>
 
   <script>
     const symbols = ["🍒", "🍋", "💎", "🎲", "🧿"];
@@ -88,13 +113,14 @@
     let coins = 100;
 
     function spin() {
-      if (coins <= 0) {
+      const bet = parseInt(document.getElementById("betAmount").value);
+      if (coins < bet) {
         document.getElementById("result").textContent = "❌ لا يوجد رصيد كافٍ!";
         document.getElementById("result").style.color = "orange";
         return;
       }
 
-      coins -= 5;
+      coins -= bet;
       document.getElementById("coinCount").textContent = coins;
 
       const slot1 = document.getElementById("slot1");
@@ -107,9 +133,9 @@
 
       if (random < winRate) {
         s1 = s2 = s3 = symbols[Math.floor(Math.random() * symbols.length)];
-        result.textContent = "🎉 مبروك! ربحت 10 عملات!";
+        result.textContent = "🎉 مبروك! ربحت " + bet * 2 + " عملة!";
         result.style.color = "lime";
-        coins += 10;
+        coins += bet * 2;
         document.getElementById("coinCount").textContent = coins;
         document.getElementById("winSound").play();
       } else {
@@ -125,7 +151,13 @@
       slot2.textContent = s2;
       slot3.textContent = s3;
     }
+
+    function resetGame() {
+      coins = 100;
+      document.getElementById("coinCount").textContent = coins;
+      document.getElementById("result").textContent = "✅ تم إعادة اللعبة!";
+      document.getElementById("result").style.color = "white";
+    }
   </script>
 </body>
 </html>
-
