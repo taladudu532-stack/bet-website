@@ -1,1 +1,185 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="UTF-8">
+  <title>🏃‍♂️ لعبة كرة الحظ</title>
+  <style>
+    body {
+      margin: 0;
+      overflow: hidden;
+      font-family: 'Arial', sans-serif;
+      background: linear-gradient(to bottom, #222, #444);
+      color: white;
+      text-align: center;
+    }
+    canvas {
+      display: block;
+      margin: 0 auto;
+      background: url('https://images.unsplash.com/photo-1607746882042-944635dfe10e') center/cover;
+      border: 2px solid gold;
+    }
+    #ui {
+      position: absolute;
+      top: 10px;
+      right: 10px;
+      text-align: right;
+    }
+    #score, #coins {
+      font-size: 18px;
+      margin: 5px;
+    }
+    #buttons {
+      position: absolute;
+      bottom: 20px;
+      right: 20px;
+    }
+    button {
+      font-size: 16px;
+      padding: 8px 16px;
+      margin: 5px;
+      border: none;
+      border-radius: 6px;
+      background: gold;
+      color: black;
+      cursor: pointer;
+    }
+  </style>
+</head>
+<body>
+  <canvas id="game" width="480" height="640"></canvas>
+  <div id="ui">
+    <div id="score">🏆 النقاط: 0</div>
+    <div id="coins">💰 العملات: 0</div>
+  </div>
+  <div id="buttons">
+    <button onclick="restartGame()">🔄 إعادة</button>
+    <button onclick="location.href='index.html'">🏠 الرئيسية</button>
+  </div>
+
+  <script>
+    const canvas = document.getElementById("game");
+    const ctx = canvas.getContext("2d");
+
+    let ball = { x: 240, y: 500, radius: 20, dy: 0 };
+    let gravity = 0.5;
+    let jump = -10;
+    let obstacles = [];
+    let coins = [];
+    let score = 0;
+    let coinCount = 0;
+    let gameOver = false;
+
+    function drawBall() {
+      ctx.beginPath();
+      ctx.arc(ball.x, ball.y, ball.radius, 0, Math.PI * 2);
+      ctx.fillStyle = "orange";
+      ctx.fill();
+      ctx.closePath();
+    }
+
+    function drawObstacles() {
+      ctx.fillStyle = "red";
+      obstacles.forEach(obs => {
+        ctx.fillRect(obs.x, obs.y, obs.w, obs.h);
+      });
+    }
+
+    function drawCoins() {
+      ctx.fillStyle = "gold";
+      coins.forEach(c => {
+        ctx.beginPath();
+        ctx.arc(c.x, c.y, 10, 0, Math.PI * 2);
+        ctx.fill();
+        ctx.closePath();
+      });
+    }
+
+    function update() {
+      if (gameOver) return;
+
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+      ball.dy += gravity;
+      ball.y += ball.dy;
+
+      if (ball.y + ball.radius > canvas.height) {
+        endGame();
+      }
+
+      obstacles.forEach(obs => {
+        obs.y += 3;
+        if (
+          ball.x > obs.x &&
+          ball.x < obs.x + obs.w &&
+          ball.y + ball.radius > obs.y &&
+          ball.y - ball.radius < obs.y + obs.h
+        ) {
+          endGame();
+        }
+      });
+
+      coins.forEach((c, i) => {
+        c.y += 3;
+        const dist = Math.hypot(ball.x - c.x, ball.y - c.y);
+        if (dist < ball.radius + 10) {
+          coinCount++;
+          coins.splice(i, 1);
+          document.getElementById("coins").textContent = "💰 العملات: " + coinCount;
+        }
+      });
+
+      obstacles = obstacles.filter(obs => obs.y < canvas.height);
+      coins = coins.filter(c => c.y < canvas.height);
+
+      if (Math.random() < 0.02) {
+        obstacles.push({ x: Math.random() * 400, y: -50, w: 80, h: 20 });
+      }
+      if (Math.random() < 0.01) {
+        coins.push({ x: Math.random() * 440 + 20, y: -20 });
+      }
+
+      score++;
+      document.getElementById("score").textContent = "🏆 النقاط: " + score;
+
+      drawBall();
+      drawObstacles();
+      drawCoins();
+
+      requestAnimationFrame(update);
+    }
+
+    function endGame() {
+      gameOver = true;
+      ctx.fillStyle = "black";
+      ctx.fillRect(0, 0, canvas.width, canvas.height);
+      ctx.fillStyle = "white";
+      ctx.font = "28px Arial";
+      ctx.fillText("💥 انتهت اللعبة!", 150, 300);
+      ctx.fillText("🏆 نقاطك: " + score, 150, 340);
+      ctx.fillText("💰 عملاتك: " + coinCount, 150, 380);
+    }
+
+    function restartGame() {
+      ball.y = 500;
+      ball.dy = 0;
+      obstacles = [];
+      coins = [];
+      score = 0;
+      coinCount = 0;
+      gameOver = false;
+      update();
+    }
+
+    document.addEventListener("keydown", e => {
+      if (e.code === "Space") ball.dy = jump;
+    });
+
+    canvas.addEventListener("click", () => {
+      ball.dy = jump;
+    });
+
+    update();
+  </script>
+</body>
+</html>
 
