@@ -1,11 +1,71 @@
-<button onclick="drawCard()">Draw Card</button>
-<p id="hand"></p>
-<script>
-let hand = [];
-function drawCard() {
-  const card = Math.floor(Math.random() * 11) + 1;
-  hand.push(card);
-  document.getElementById("hand").innerText = "Your hand: " + hand.join(", ");
-}
-</script>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>🃏 Blackjack</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <h1>🃏 Blackjack</h1>
+  <h2 id="balance"></h2>
+  <button onclick="drawCard()">Draw Card (Cost: 10 coins)</button>
+  <button onclick="resetGame()">Reset Hand</button>
+  <button onclick="refillCoins()">Refill Coins</button>
+  <p id="hand"></p>
+  <p id="result"></p>
 
+  <script>
+    // Initialize coins
+    if (!localStorage.getItem("coins")) {
+      localStorage.setItem("coins", "100");
+    }
+
+    let hand = [];
+
+    function updateBalance() {
+      document.getElementById("balance").innerText = "Coins: " + localStorage.getItem("coins");
+    }
+
+    function drawCard() {
+      let coins = parseInt(localStorage.getItem("coins"));
+      if (coins < 10) {
+        alert("Not enough coins!");
+        return;
+      }
+
+      coins -= 10;
+      localStorage.setItem("coins", coins);
+      updateBalance();
+
+      const card = Math.floor(Math.random() * 11) + 1;
+      hand.push(card);
+      document.getElementById("hand").innerText = "Your hand: " + hand.join(", ");
+
+      const total = hand.reduce((a, b) => a + b, 0);
+      if (total === 21) {
+        document.getElementById("result").innerText = "🎉 Blackjack! You win 20 coins!";
+        coins += 20;
+        localStorage.setItem("coins", coins);
+        updateBalance();
+      } else if (total > 21) {
+        document.getElementById("result").innerText = "💥 Bust! You lose.";
+      } else {
+        document.getElementById("result").innerText = "Total: " + total;
+      }
+    }
+
+    function resetGame() {
+      hand = [];
+      document.getElementById("hand").innerText = "";
+      document.getElementById("result").innerText = "";
+    }
+
+    function refillCoins() {
+      localStorage.setItem("coins", "100");
+      updateBalance();
+    }
+
+    updateBalance();
+  </script>
+</body>
+</html>
