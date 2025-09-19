@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>🛠️ Admin Panel</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <h1>🛠️ TalaBet Admin Panel</h1>
+
+  <label>Username:</label>
+  <input type="text" id="username" placeholder="e.g. client123"><br><br>
+
+  <label>Coin Amount:</label>
+  <input type="number" id="coins" placeholder="e.g. 500"><br><br>
+
+  <button onclick="addOrUpdateUser()">💾 Save to Firebase</button>
+  <p id="status"></p>
+
+  <!-- Firebase SDKs -->
+  <script src="https://www.gstatic.com/firebasejs/10.5.0/firebase-app.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.5.0/firebase-firestore.js"></script>
+
+  <!-- Firebase Config -->
+  <script>
+    const firebaseConfig = {
+      apiKey: "AIzaSyASQomgcUm0LNNM8ABYxq-vqz7BYpO-eg4",
+      authDomain: "talabet-89fce.firebaseapp.com",
+      projectId: "talabet-89fce",
+      storageBucket: "talabet-89fce.firebasestorage.app",
+      messagingSenderId: "767205554053",
+      appId: "1:767205554053:web:32cc62707e62aca28b76ec",
+      measurementId: "G-FKLT279RDX"
+    };
+
+    const app = firebase.initializeApp(firebaseConfig);
+    const db = firebase.firestore();
+  </script>
+
+  <!-- Admin Logic -->
+  <script>
+    async function addOrUpdateUser() {
+      const username = document.getElementById("username").value.trim();
+      const coins = parseInt(document.getElementById("coins").value);
+
+      if (!username || isNaN(coins)) {
+        document.getElementById("status").innerText = "❌ Please enter valid username and coin amount.";
+        return;
+      }
+
+      try {
+        await db.collection("users").doc(username).set({ coins: coins }, { merge: true });
+        document.getElementById("status").innerText = `✅ ${username} now has ${coins} coins.`;
+      } catch (error) {
+        document.getElementById("status").innerText = "❌ Error: " + error.message;
+      }
+    }
+  </script>
+</body>
+</html>
+
+
