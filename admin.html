@@ -7,25 +7,30 @@
     body {
       font-family: Arial, sans-serif;
       padding: 30px;
-      background: #f9f9f9;
+      background: #b30000; /* 🔴 Deep red background */
+      color: #fff;
     }
     h1 {
-      color: #333;
+      color: #fff;
     }
     input {
       padding: 8px;
       margin: 5px 0;
       width: 250px;
+      border: none;
+      border-radius: 4px;
     }
     button {
       padding: 10px 20px;
-      background: #007bff;
-      color: white;
+      background: #ffffff;
+      color: #b30000;
       border: none;
+      border-radius: 4px;
       cursor: pointer;
+      font-weight: bold;
     }
     button:hover {
-      background: #0056b3;
+      background: #ffcccc;
     }
     #status {
       margin-top: 20px;
@@ -46,10 +51,9 @@
   <p id="status"></p>
 
   <!-- Firebase SDKs -->
-  <script src="https://www.gstatic.com/firebasejs/10.5.0/firebase-app.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/10.5.0/firebase-firestore.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.5.0/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.5.0/firebase-firestore-compat.js"></script>
 
-  <!-- Firebase Config -->
   <script>
     const firebaseConfig = {
       apiKey: "AIzaSyASQomgcUm0LNNM8ABYxq-vqz7BYpO-eg4",
@@ -63,10 +67,7 @@
 
     firebase.initializeApp(firebaseConfig);
     const db = firebase.firestore();
-  </script>
 
-  <!-- Admin Logic -->
-  <script>
     async function addOrUpdateUser() {
       const username = document.getElementById("username").value.trim();
       const coins = parseInt(document.getElementById("coins").value);
