@@ -1,0 +1,235 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TalaBet - Coin Flip</title>
+    <style>
+        body {
+            font-family: 'Arial', sans-serif;
+            background: #b30000; /* 🔴 Your signature red */
+            color: white;
+            text-align: center;
+            padding: 30px;
+        }
+        .container {
+            background: rgba(0, 0, 0, 0.4);
+            padding: 30px;
+            border-radius: 15px;
+            max-width: 500px;
+            margin: auto;
+        }
+        input, button, select {
+            padding: 12px;
+            margin: 10px;
+            border: none;
+            border-radius: 5px;
+            font-size: 16px;
+        }
+        button {
+            background: #fff;
+            color: #b30000;
+            font-weight: bold;
+            cursor: pointer;
+            transition: 0.3s;
+        }
+        button:hover {
+            background: #ffcccc;
+        }
+        button:disabled {
+            background: #ccc;
+            cursor: not-allowed;
+        }
+        #result {
+            font-size: 24px;
+            font-weight: bold;
+            margin: 20px;
+            min-height: 30px;
+        }
+        .coin {
+            width: 150px;
+            height: 150px;
+            background-color: #ffd700;
+            border-radius: 50%;
+            margin: 20px auto;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 22px;
+            font-weight: bold;
+            border: 4px solid #daa520;
+            transition: transform 1s ease-out;
+        }
+        .flipping {
+            animation: flip 1s ease-out;
+        }
+        @keyframes flip {
+            0% { transform: rotateY(0deg); }
+            100% { transform: rotateY(1080deg); } /* Spins 3 times */
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🪙 TalaBet Coin Flip</h1>
+        <p>Your Balance: <strong><span id="userBalance">0</span> coins</strong></p>
+
+        <div>
+            <label for="betAmount">Bet Amount:</label><br>
+            <input type="number" id="betAmount" placeholder="Coins to bet" min="1"><br>
+
+            <label>Choose your side:</label><br>
+            <button onclick="chooseSide('Heads')">HEADS</button>
+            <button onclick="chooseSide('Tails')">TAILS</button>
+        </div>
+
+        <div class="coin" id="coin">?</div>
+
+        <div id="result"></div>
+        <p id="status"></p>
+    </div>
+
+    <!-- Firebase SDK -->
+    <script src="https://www.gstatic.com/firebasejs/10.5.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.5.0/firebase-firestore-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.5.0/firebase-auth-compat.js"></script>
+
+    <script>
+        // Your Firebase Config (Same as your admin panel)
+        const firebaseConfig = {
+            apiKey: "AIzaSyASQomgcUm0LNNM8ABYxq-vqz7BYpO-eg4",
+            authDomain: "talabet-89fce.firebaseapp.com",
+            projectId: "talabet-89fce",
+            storageBucket: "talabet-89fce.firebasestorage.app",
+            messagingSenderId: "767205554053",
+            appId: "1:767205554053:web:32cc62707e62aca28b76ec",
+            measurementId: "G-FKLT279RDX"
+        };
+
+        // Initialize Firebase
+        firebase.initializeApp(firebaseConfig);
+        const db = firebase.firestore();
+        const auth = firebase.auth();
+
+        // Global Variables
+        let currentUser = null;
+        let userBalance = 0;
+        let userChoice = null;
+        let betAmount = 0;
+
+        // Function to choose Heads or Tails
+        function chooseSide(side) {
+            userChoice = side;
+            betAmount = parseInt(document.getElementById('betAmount').value);
+
+            if (!betAmount || betAmount < 1) {
+                alert("Please enter a valid bet amount.");
+                return;
+            }
+            if (betAmount > userBalance) {
+                alert("You don't have enough coins!");
+                return;
+            }
+
+            document.getElementById('status').innerText = `You bet ${betAmount} on ${side}. Flipping...`;
+            playGame();
+        }
+
+        // Main Game Function
+        async function playGame() {
+            const coinEl = document.getElementById('coin');
+            const resultEl = document.getElementById('result');
+            const statusEl = document.getElementById('status');
+
+            // Disable buttons during the game
+            document.querySelectorAll('button').forEach(b => b.disabled = true);
+
+            // 1. Animate the coin flip
+            coinEl.textContent = '';
+            coinEl.classList.add('flipping');
+
+            // 2. Determine the result after the animation
+            setTimeout(async () => {
+                const outcomes = ['Heads', 'Tails'];
+                const outcome = outcomes[Math.floor(Math.random() * outcomes.length)]; // Random result
+
+                // 3. Stop animation and show result
+                coinEl.classList.remove('flipping');
+                coinEl.textContent = outcome;
+
+                // 4. Check win/loss
+                if (userChoice === outcome) {
+                    // WIN - Double the bet amount
+                    const winAmount = betAmount * 2;
+                    resultEl.innerText = `🎉 You won ${winAmount} coins!`;
+                    await updateUserBalance(winAmount - betAmount); // Add profit to balance
+                } else {
+                    // LOSE - Subtract the bet amount
+                    resultEl.innerText = `❌ It was ${outcome}. You lost.`;
+                    await updateUserBalance(-betAmount); // Subtract the bet
+                }
+
+                // 5. Re-enable buttons and reset for next round
+                statusEl.innerText = "Place your next bet!";
+                document.querySelectorAll('button').forEach(b => b.disabled = false);
+                userChoice = null;
+
+            }, 1000); // Wait for the animation to finish
+        }
+
+        // Function to update the user's balance in Firebase
+        async function updateUserBalance(amount) {
+            try {
+                userBalance += amount;
+                // Update the user's document in the 'users' collection
+                await db.collection("users").doc(currentUser.uid).set({
+                    coins: userBalance,
+                    username: currentUser.email // or displayName if you set it
+                }, { merge: true });
+                // Update the UI
+                document.getElementById('userBalance').textContent = userBalance;
+            } catch (error) {
+                console.error("Error updating balance:", error);
+                alert("Error updating balance. See console for details.");
+            }
+        }
+
+        // --- FIREBASE AUTHENTICATION & INIT ---
+        function initApp() {
+            // Listen for user auth state changes (if they log in/out)
+            auth.onAuthStateChanged(async (user) => {
+                if (user) {
+                    // User is signed in.
+                    currentUser = user;
+                    try {
+                        // Fetch the user's document from Firestore
+                        const userDoc = await db.collection("users").doc(user.uid).get();
+                        if (userDoc.exists) {
+                            userBalance = userDoc.data().coins || 0;
+                            document.getElementById('userBalance').textContent = userBalance;
+                        } else {
+                            // If the document doesn't exist, create it with a default balance
+                            userBalance = 100; // Default starting balance
+                            await db.collection("users").doc(user.uid).set({
+                                coins: userBalance,
+                                username: user.email
+                            });
+                            document.getElementById('userBalance').textContent = userBalance;
+                        }
+                    } catch (error) {
+                        console.error("Error getting user data:", error);
+                    }
+                } else {
+                    // No user is signed in. Redirect to login or your main site.
+                    alert("Please log in to play.");
+                    // window.location.href = "https://taladudu532-stack.github.io/bet-website/"; // Redirect to your site
+                }
+            });
+        }
+
+        window.onload = function() {
+            initApp();
+        };
+    </script>
+</body>
+</html>
