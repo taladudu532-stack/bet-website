@@ -1,1 +1,10 @@
+<button onclick="race()">Start Race</button>
+<p id="result"></p>
+<script>
+function race() {
+  const racers = ["🪙 Gold", "🪙 Silver", "🪙 Bronze"];
+  const winner = racers[Math.floor(Math.random() * racers.length)];
+  document.getElementById("result").innerText = "Winner: " + winner;
+}
+</script>
 
