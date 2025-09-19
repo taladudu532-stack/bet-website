@@ -1,0 +1,9 @@
+<button onclick="spinWheel()">Spin</button>
+<p id="result"></p>
+<script>
+function spinWheel() {
+  const numbers = Array.from({length: 36}, (_, i) => i + 1);
+  const result = numbers[Math.floor(Math.random() * numbers.length)];
+  document.getElementById("result").innerText = "Landed on " + result;
+}
+</script>
