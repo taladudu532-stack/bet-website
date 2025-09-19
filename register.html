@@ -6,23 +6,21 @@
   <style>
     body {
       font-family: Arial, sans-serif;
-      padding: 30px;
       background: #b30000;
-      color: #fff;
-    }
-    h1 {
-      color: #fff;
+      color: white;
+      text-align: center;
+      padding: 50px;
     }
     input {
       padding: 10px;
-      margin: 10px 0;
+      margin: 10px;
       width: 250px;
       border: none;
       border-radius: 5px;
     }
     button {
       padding: 10px 20px;
-      background: #fff;
+      background: white;
       color: #b30000;
       font-weight: bold;
       border: none;
@@ -40,20 +38,14 @@
 </head>
 <body>
   <h1>📝 Register New User</h1>
-
-  <label>👤 Username:</label><br>
-  <input type="text" id="username" placeholder="e.g. client456"><br><br>
-
-  <label>💰 Starting Coins:</label><br>
-  <input type="number" id="coins" placeholder="e.g. 100"><br><br>
-
-  <button onclick="registerUser()">✅ Register</button>
+  <input type="text" id="username" placeholder="Username"><br>
+  <input type="password" id="password" placeholder="Password"><br>
+  <input type="number" id="coins" placeholder="Starting Coins"><br>
+  <button onclick="registerUser()">Register</button>
   <p id="status"></p>
 
-  <!-- Firebase SDKs -->
   <script src="https://www.gstatic.com/firebasejs/10.5.0/firebase-app-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/10.5.0/firebase-firestore-compat.js"></script>
-
   <script>
     const firebaseConfig = {
       apiKey: "AIzaSyASQomgcUm0LNNM8ABYxq-vqz7BYpO-eg4",
@@ -64,31 +56,28 @@
       appId: "1:767205554053:web:32cc62707e62aca28b76ec",
       measurementId: "G-FKLT279RDX"
     };
-
     firebase.initializeApp(firebaseConfig);
     const db = firebase.firestore();
 
     async function registerUser() {
       const username = document.getElementById("username").value.trim();
+      const password = document.getElementById("password").value.trim();
       const coins = parseInt(document.getElementById("coins").value);
 
-      if (!username || isNaN(coins)) {
-        document.getElementById("status").innerText = "❌ Enter valid username and coin amount.";
+      if (!username || !password || isNaN(coins)) {
+        document.getElementById("status").innerText = "❌ Fill all fields correctly.";
         return;
       }
 
-      try {
-        const doc = await db.collection("users").doc(username).get();
-        if (doc.exists) {
-          document.getElementById("status").innerText = "⚠️ Username already exists.";
-          return;
-        }
-
-        await db.collection("users").doc(username).set({ coins: coins });
-        document.getElementById("status").innerText = `✅ ${username} registered with ${coins} coins.`;
-      } catch (error) {
-        document.getElementById("status").innerText = "❌ Error: " + error.message;
+      const doc = await db.collection("users").doc(username).get();
+      if (doc.exists) {
+        document.getElementById("status").innerText = "⚠️ Username already exists.";
+        return;
       }
+
+      await db.collection("users").doc(username).set({ password, coins });
+      localStorage.setItem("username", username);
+      document.getElementById("status").innerText = `✅ Registered as ${username}.`;
     }
   </script>
 </body>
