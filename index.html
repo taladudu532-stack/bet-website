@@ -1,28 +1,45 @@
 <!DOCTYPE html>
-<html lang="ar">
+<html lang="en">
 <head>
   <meta charset="UTF-8">
-  <title>الرئيسية</title>
-  <link rel="stylesheet" href="style.css">
+  <title>TalaBet Home</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background: #b30000;
+      color: white;
+      text-align: center;
+      padding: 50px;
+    }
+    h1 {
+      font-size: 36px;
+      margin-bottom: 20px;
+    }
+    .button {
+      display: block;
+      margin: 15px auto;
+      padding: 12px 24px;
+      background: white;
+      color: #b30000;
+      font-weight: bold;
+      border: none;
+      border-radius: 6px;
+      text-decoration: none;
+      width: 250px;
+    }
+    .button:hover {
+      background: #ffcccc;
+    }
+  </style>
 </head>
 <body>
-  <h1>مرحباً بك في موقع الرهان</h1>
-  <nav>
-    <a href="register.html">
-  <button style="padding: 10px 20px; background: #b30000; color: white; border: none; border-radius: 5px;">
-    📝 Register New User
-  </button>
-</a>
-<script>
-  window.location.href = "register.html";
-</script>
+  <h1>🎰 Welcome to TalaBet</h1>
+  <p>Choose an option below to get started:</p>
 
-    <a href="signin.html">تسجيل الدخول</a>
-    <a href="games.html">الألعاب</a>
-    <a href="sport.html">الرياضة</a>
-    <a href="bets.html">الرهانات</a>
-  </nav>
-  <p>ابدأ رحلتك في عالم الرهان الآن!</p>
+  <a href="register.html" class="button">📝 Register New User</a>
+  <a href="blackjack.html" class="button">🃏 Play Blackjack</a>
+  <a href="admin.html" class="button">🛠️ Admin Panel</a>
+
+  <p style="margin-top: 40px;">More games coming soon...</p>
 </body>
 </html>
-
