@@ -1,9 +1,0 @@
-<button onclick="simulateMatch()">Simulate Match</button>
-<p id="result"></p>
-<script>
-function simulateMatch() {
-  const outcomes = ["Team A wins", "Team B wins", "Draw"];
-  const result = outcomes[Math.floor(Math.random() * outcomes.length)];
-  document.getElementById("result").innerText = result;
-}
-</script>
