@@ -3,7 +3,36 @@
 <head>
   <meta charset="UTF-8">
   <title>🃏 Blackjack</title>
-  <link rel="stylesheet" href="style.css">
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      padding: 30px;
+      background: #b30000; /* 🔴 Red background */
+      color: #fff;
+    }
+    h1 {
+      color: #fff;
+    }
+    input, button {
+      padding: 10px;
+      margin: 10px 0;
+      border: none;
+      border-radius: 5px;
+    }
+    button {
+      background: #fff;
+      color: #b30000;
+      font-weight: bold;
+      cursor: pointer;
+    }
+    button:hover {
+      background: #ffcccc;
+    }
+    #balance, #hand, #result {
+      margin-top: 20px;
+      font-size: 18px;
+    }
+  </style>
 </head>
 <body>
   <h1>🃏 Blackjack</h1>
@@ -15,11 +44,11 @@
   <p id="result"></p>
 
   <!-- Firebase SDKs -->
-  <script src="https://www.gstatic.com/firebasejs/10.5.0/firebase-app.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/10.5.0/firebase-firestore.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.5.0/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.5.0/firebase-firestore-compat.js"></script>
 
-  <!-- Firebase Config -->
   <script>
+    // 🔐 Firebase Config
     const firebaseConfig = {
       apiKey: "AIzaSyASQomgcUm0LNNM8ABYxq-vqz7BYpO-eg4",
       authDomain: "talabet-89fce.firebaseapp.com",
@@ -30,29 +59,32 @@
       measurementId: "G-FKLT279RDX"
     };
 
-    const app = firebase.initializeApp(firebaseConfig);
+    // 🔌 Initialize Firebase
+    firebase.initializeApp(firebaseConfig);
     const db = firebase.firestore();
-  </script>
 
-  <!-- Blackjack Logic -->
-  <script>
-    const username = "client123"; // 🔐 Replace with dynamic user ID if needed
+    // 👤 Hardcoded user
+    const username = "client123";
     let hand = [];
 
+    // 🔄 Get coin balance
     async function getCoins() {
       const doc = await db.collection("users").doc(username).get();
       return doc.exists ? doc.data().coins : 0;
     }
 
+    // 💾 Update coin balance
     async function updateCoins(amount) {
       await db.collection("users").doc(username).update({ coins: amount });
     }
 
+    // 📺 Show balance
     async function showBalance() {
       const coins = await getCoins();
       document.getElementById("balance").innerText = "Coins: " + coins;
     }
 
+    // 🎮 Draw card
     async function drawCard() {
       let coins = await getCoins();
       if (coins < 10) {
@@ -81,17 +113,20 @@
       }
     }
 
+    // 🔄 Reset hand
     function resetGame() {
       hand = [];
       document.getElementById("hand").innerText = "";
       document.getElementById("result").innerText = "";
     }
 
+    // 🧪 Refill coins (testing only)
     async function refillCoins() {
       await updateCoins(100);
       await showBalance();
     }
 
+    // 🚀 Load balance on start
     showBalance();
   </script>
 </body>
