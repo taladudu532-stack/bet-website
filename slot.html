@@ -1,0 +1,9 @@
+<button onclick="spin()">Spin</button>
+<p id="result"></p>
+<script>
+function spin() {
+  const symbols = ["🍒", "🍋", "🔔", "💎"];
+  const result = Array(3).fill().map(() => symbols[Math.floor(Math.random() * symbols.length)]);
+  document.getElementById("result").innerText = result.join(" ");
+}
+</script>
