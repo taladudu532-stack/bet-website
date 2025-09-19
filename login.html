@@ -2,42 +2,98 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <title>🔐 Login</title>
+  <title>🔐 TalaBet Login</title>
   <style>
-    body { font-family: Arial; background: #b30000; color: white; text-align: center; padding: 50px; }
-    input, button { padding: 10px; margin: 10px; width: 250px; border-radius: 5px; border: none; }
-    button { background: white; color: #b30000; font-weight: bold; cursor: pointer; }
-    button:hover { background: #ffcccc; }
+    body {
+      font-family: Arial, sans-serif;
+      background: #b30000;
+      color: white;
+      text-align: center;
+      padding: 50px;
+    }
+    input {
+      padding: 10px;
+      margin: 10px;
+      width: 250px;
+      border: none;
+      border-radius: 5px;
+    }
+    button {
+      padding: 10px 20px;
+      background: white;
+      color: #b30000;
+      font-weight: bold;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+    }
+    button:hover {
+      background: #ffcccc;
+    }
+    #status {
+      margin-top: 20px;
+      font-weight: bold;
+    }
+    a {
+      color: white;
+      text-decoration: underline;
+    }
   </style>
 </head>
 <body>
-  <h1>🔐 Login</h1>
+  <h1>🔐 Login to TalaBet</h1>
   <input type="text" id="username" placeholder="Username"><br>
   <input type="password" id="password" placeholder="Password"><br>
-  <button onclick="login()">Login</button>
+  <button onclick="loginUser()">Login</button>
   <p id="status"></p>
-  <a href="register.html" style="color:white;">Create a new account</a>
+  <a href="register.html">Don't have an account? Register here</a>
 
+  <!-- Firebase SDKs -->
   <script src="https://www.gstatic.com/firebasejs/10.5.0/firebase-app-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/10.5.0/firebase-firestore-compat.js"></script>
+
   <script>
-    const firebaseConfig = { /* your config */ };
+    const firebaseConfig = {
+      apiKey: "AIzaSyASQomgcUm0LNNM8ABYxq-vqz7BYpO-eg4",
+      authDomain: "talabet-89fce.firebaseapp.com",
+      projectId: "talabet-89fce",
+      storageBucket: "talabet-89fce.firebasestorage.app",
+      messagingSenderId: "767205554053",
+      appId: "1:767205554053:web:32cc62707e62aca28b76ec",
+      measurementId: "G-FKLT279RDX"
+    };
+
     firebase.initializeApp(firebaseConfig);
     const db = firebase.firestore();
 
-    async function login() {
+    async function loginUser() {
       const username = document.getElementById("username").value.trim();
       const password = document.getElementById("password").value.trim();
 
-      const doc = await db.collection("users").doc(username).get();
-      if (!doc.exists || doc.data().password !== password) {
-        document.getElementById("status").innerText = "❌ Invalid credentials.";
+      if (!username || !password) {
+        document.getElementById("status").innerText = "❌ Enter both username and password.";
         return;
       }
 
-      localStorage.setItem("username", username);
-      document.getElementById("status").innerText = `✅ Logged in as ${username}.`;
-      setTimeout(() => window.location.href = "blackjack.html", 1000);
+      try {
+        const doc = await db.collection("users").doc(username).get();
+        if (!doc.exists) {
+          document.getElementById("status").innerText = "❌ Username not found.";
+          return;
+        }
+
+        const userData = doc.data();
+        if (userData.password !== password) {
+          document.getElementById("status").innerText = "❌ Incorrect password.";
+          return;
+        }
+
+        localStorage.setItem("username", username);
+        document.getElementById("status").innerText = `✅ Logged in as ${username}. Redirecting...`;
+        setTimeout(() => window.location.href = "blackjack.html", 1000);
+      } catch (error) {
+        document.getElementById("status").innerText = "❌ Error: " + error.message;
+      }
     }
   </script>
 </body>
