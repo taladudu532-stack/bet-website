@@ -2,32 +2,30 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <title>🛠️ TalaBet Admin Panel</title>
+  <title>🛠️ Admin Panel</title>
   <style>
     body {
       font-family: Arial, sans-serif;
-      padding: 30px;
-      background: #b30000; /* 🔴 Deep red background */
-      color: #fff;
-    }
-    h1 {
-      color: #fff;
+      background: #b30000;
+      color: white;
+      text-align: center;
+      padding: 50px;
     }
     input {
-      padding: 8px;
-      margin: 5px 0;
+      padding: 10px;
+      margin: 10px;
       width: 250px;
       border: none;
-      border-radius: 4px;
+      border-radius: 5px;
     }
     button {
       padding: 10px 20px;
-      background: #ffffff;
+      background: white;
       color: #b30000;
-      border: none;
-      border-radius: 4px;
-      cursor: pointer;
       font-weight: bold;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
     }
     button:hover {
       background: #ffcccc;
@@ -41,19 +39,21 @@
 <body>
   <h1>🛠️ TalaBet Admin Panel</h1>
 
-  <label>👤 Username:</label><br>
-  <input type="text" id="username" placeholder="e.g. client123"><br><br>
+  <div id="auth">
+    <input type="password" id="adminPass" placeholder="Enter Admin Password"><br>
+    <button onclick="checkAdmin()">Unlock Panel</button>
+    <p id="status"></p>
+  </div>
 
-  <label>💰 Coin Amount:</label><br>
-  <input type="number" id="coins" placeholder="e.g. 500"><br><br>
+  <div id="panel" style="display:none;">
+    <input type="text" id="username" placeholder="Username"><br>
+    <input type="number" id="coins" placeholder="Coin Amount"><br>
+    <button onclick="updateUser()">Save to Firebase</button>
+    <p id="result"></p>
+  </div>
 
-  <button onclick="addOrUpdateUser()">💾 Save to Firebase</button>
-  <p id="status"></p>
-
-  <!-- Firebase SDKs -->
   <script src="https://www.gstatic.com/firebasejs/10.5.0/firebase-app-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/10.5.0/firebase-firestore-compat.js"></script>
-
   <script>
     const firebaseConfig = {
       apiKey: "AIzaSyASQomgcUm0LNNM8ABYxq-vqz7BYpO-eg4",
@@ -64,25 +64,32 @@
       appId: "1:767205554053:web:32cc62707e62aca28b76ec",
       measurementId: "G-FKLT279RDX"
     };
-
     firebase.initializeApp(firebaseConfig);
     const db = firebase.firestore();
 
-    async function addOrUpdateUser() {
+    const adminPassword = "TalaSecret123"; // 🔐 Change this to your private admin password
+
+    function checkAdmin() {
+      const input = document.getElementById("adminPass").value;
+      if (input === adminPassword) {
+        document.getElementById("auth").style.display = "none";
+        document.getElementById("panel").style.display = "block";
+      } else {
+        document.getElementById("status").innerText = "❌ Incorrect password.";
+      }
+    }
+
+    async function updateUser() {
       const username = document.getElementById("username").value.trim();
       const coins = parseInt(document.getElementById("coins").value);
 
       if (!username || isNaN(coins)) {
-        document.getElementById("status").innerText = "❌ Please enter a valid username and coin amount.";
+        document.getElementById("result").innerText = "❌ Fill all fields.";
         return;
       }
 
-      try {
-        await db.collection("users").doc(username).set({ coins: coins }, { merge: true });
-        document.getElementById("status").innerText = `✅ ${username} now has ${coins} coins.`;
-      } catch (error) {
-        document.getElementById("status").innerText = "❌ Error: " + error.message;
-      }
+      await db.collection("users").doc(username).set({ coins }, { merge: true });
+      document.getElementById("result").innerText = `✅ ${username} now has ${coins} coins.`;
     }
   </script>
 </body>
