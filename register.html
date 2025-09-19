@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>📝 TalaBet Registration</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      padding: 30px;
+      background: #b30000;
+      color: #fff;
+    }
+    h1 {
+      color: #fff;
+    }
+    input {
+      padding: 10px;
+      margin: 10px 0;
+      width: 250px;
+      border: none;
+      border-radius: 5px;
+    }
+    button {
+      padding: 10px 20px;
+      background: #fff;
+      color: #b30000;
+      font-weight: bold;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+    }
+    button:hover {
+      background: #ffcccc;
+    }
+    #status {
+      margin-top: 20px;
+      font-weight: bold;
+    }
+  </style>
+</head>
+<body>
+  <h1>📝 Register New User</h1>
+
+  <label>👤 Username:</label><br>
+  <input type="text" id="username" placeholder="e.g. client456"><br><br>
+
+  <label>💰 Starting Coins:</label><br>
+  <input type="number" id="coins" placeholder="e.g. 100"><br><br>
+
+  <button onclick="registerUser()">✅ Register</button>
+  <p id="status"></p>
+
+  <!-- Firebase SDKs -->
+  <script src="https://www.gstatic.com/firebasejs/10.5.0/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.5.0/firebase-firestore-compat.js"></script>
+
+  <script>
+    const firebaseConfig = {
+      apiKey: "AIzaSyASQomgcUm0LNNM8ABYxq-vqz7BYpO-eg4",
+      authDomain: "talabet-89fce.firebaseapp.com",
+      projectId: "talabet-89fce",
+      storageBucket: "talabet-89fce.firebasestorage.app",
+      messagingSenderId: "767205554053",
+      appId: "1:767205554053:web:32cc62707e62aca28b76ec",
+      measurementId: "G-FKLT279RDX"
+    };
+
+    firebase.initializeApp(firebaseConfig);
+    const db = firebase.firestore();
+
+    async function registerUser() {
+      const username = document.getElementById("username").value.trim();
+      const coins = parseInt(document.getElementById("coins").value);
+
+      if (!username || isNaN(coins)) {
+        document.getElementById("status").innerText = "❌ Enter valid username and coin amount.";
+        return;
+      }
+
+      try {
+        const doc = await db.collection("users").doc(username).get();
+        if (doc.exists) {
+          document.getElementById("status").innerText = "⚠️ Username already exists.";
+          return;
+        }
+
+        await db.collection("users").doc(username).set({ coins: coins });
+        document.getElementById("status").innerText = `✅ ${username} registered with ${coins} coins.`;
+      } catch (error) {
+        document.getElementById("status").innerText = "❌ Error: " + error.message;
+      }
+    }
+  </script>
+</body>
+</html>
