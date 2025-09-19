@@ -1,1 +1,10 @@
+<button onclick="flip()">Flip Card</button>
+<p id="result"></p>
+<script>
+function flip() {
+  const cards = ["🎯 Match", "❌ Miss"];
+  const result = cards[Math.floor(Math.random() * cards.length)];
+  document.getElementById("result").innerText = result;
+}
+</script>
 
