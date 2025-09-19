@@ -1,163 +1,31 @@
 <!DOCTYPE html>
-<html lang="ar" dir="rtl">
+<html lang="en">
 <head>
   <meta charset="UTF-8">
-  <title>ماكينة الحظ الكبرى</title>
+  <title>Tala-bet Games</title>
   <link rel="stylesheet" href="style.css">
   <style>
-    body {
-      background-image: url('https://images.unsplash.com/photo-1549921296-3a6b5a4b1b9b');
-      background-size: cover;
-      background-position: center;
-      color: white;
-      font-family: 'Arial', sans-serif;
-      text-align: center;
-      padding: 20px;
-    }
-    .slot-container {
-      display: flex;
-      justify-content: center;
-      gap: 20px;
-      margin: 30px 0;
-    }
-    .slot {
-      width: 100px;
-      height: 100px;
-      background-color: rgba(0,0,0,0.7);
-      border: 3px solid gold;
-      border-radius: 10px;
-      font-size: 60px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      animation: spin 0.5s ease;
-      box-shadow: 0 0 20px gold;
-    }
-    @keyframes spin {
-      0% { transform: scale(1); }
-      50% { transform: scale(1.3); }
-      100% { transform: scale(1); }
-    }
-    button {
-      padding: 12px 24px;
-      font-size: 20px;
-      margin-top: 20px;
-      cursor: pointer;
-      background-color: gold;
-      border: none;
-      border-radius: 8px;
-      color: black;
-    }
-    #result {
-      font-size: 24px;
-      margin-top: 20px;
-      font-weight: bold;
-    }
-    #coins {
-      font-size: 20px;
-      margin-top: 10px;
-    }
-    #home, #reset {
-      margin-top: 30px;
-      display: inline-block;
-      font-size: 18px;
-      color: #00f;
-      text-decoration: underline;
-      margin-right: 20px;
-    }
-    #controls {
-      margin-top: 20px;
-    }
-    select {
-      font-size: 18px;
-      padding: 5px;
-    }
+    body { font-family: Arial, sans-serif; background: #111; color: #fff; text-align: center; }
+    h1 { margin-top: 30px; }
+    .game-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 20px; padding: 40px; }
+    .game-card { background: #222; border-radius: 10px; padding: 20px; transition: 0.3s; }
+    .game-card:hover { background: #333; }
+    .game-card a { color: #0ff; text-decoration: none; font-size: 18px; font-weight: bold; }
   </style>
 </head>
 <body>
-  <h1>🎰 ماكينة الحظ الكبرى</h1>
-  <p>اختر مبلغ الرهان واضغط لتدوير الرموز. إذا تطابقت الثلاثة، تربح!</p>
-
-  <div id="coins">💰 رصيدك: <span id="coinCount">100</span> عملة</div>
-
-  <div id="controls">
-    <label>💸 مبلغ الرهان:</label>
-    <select id="betAmount">
-      <option value="5">5 عملات</option>
-      <option value="10">10 عملات</option>
-      <option value="20">20 عملة</option>
-    </select>
+  <h1>🎮 Choose Your Game</h1>
+  <div class="game-grid">
+    <div class="game-card"><a href="slot.html">🎰 Slot Machine</a></div>
+    <div class="game-card"><a href="roulette.html">🎡 Roulette</a></div>
+    <div class="game-card"><a href="ball.index.html">⚽ Sports Betting</a></div>
+    <div class="game-card"><a href="blackjack.html">🃏 Blackjack</a></div>
+    <div class="game-card"><a href="dice.html">🎲 Dice Roll</a></div>
+    <div class="game-card"><a href="wheel.html">🌀 Lucky Wheel</a></div>
+    <div class="game-card"><a href="scratch.html">🎟️ Scratch Card</a></div>
+    <div class="game-card"><a href="quiz.html">🧠 Trivia Quiz</a></div>
+    <div class="game-card"><a href="race.html">🏁 Coin Race</a></div>
+    <div class="game-card"><a href="memory.html">🧩 Memory Match</a></div>
   </div>
-
-  <div class="slot-container">
-    <div class="slot" id="slot1">🍒</div>
-    <div class="slot" id="slot2">🍋</div>
-    <div class="slot" id="slot3">💎</div>
-  </div>
-
-  <button onclick="spin()">🎯 تدوير</button>
-  <div id="result"></div>
-
-  <div>
-    <a id="home" href="index.html">🏠 العودة إلى الرئيسية</a>
-    <a id="reset" href="#" onclick="resetGame()">🔄 إعادة اللعبة</a>
-  </div>
-
-  <audio id="winSound" src="https://cdn.pixabay.com/download/audio/2022/03/15/audio_3f6b7b1e4e.mp3?filename=success-1-6297.mp3"></audio>
-  <audio id="loseSound" src="https://cdn.pixabay.com/download/audio/2022/03/15/audio_3f6b7b1e4e.mp3?filename=fail-1-6298.mp3"></audio>
-  <audio id="bgMusic" src="https://cdn.pixabay.com/download/audio/2022/03/15/audio_3f6b7b1e4e.mp3?filename=casino-theme.mp3" autoplay loop></audio>
-
-  <script>
-    const symbols = ["🍒", "🍋", "💎", "🎲", "🧿"];
-    const winRate = 0.3;
-    let coins = 100;
-
-    function spin() {
-      const bet = parseInt(document.getElementById("betAmount").value);
-      if (coins < bet) {
-        document.getElementById("result").textContent = "❌ لا يوجد رصيد كافٍ!";
-        document.getElementById("result").style.color = "orange";
-        return;
-      }
-
-      coins -= bet;
-      document.getElementById("coinCount").textContent = coins;
-
-      const slot1 = document.getElementById("slot1");
-      const slot2 = document.getElementById("slot2");
-      const slot3 = document.getElementById("slot3");
-      const result = document.getElementById("result");
-
-      let s1, s2, s3;
-      const random = Math.random();
-
-      if (random < winRate) {
-        s1 = s2 = s3 = symbols[Math.floor(Math.random() * symbols.length)];
-        result.textContent = "🎉 مبروك! ربحت " + bet * 2 + " عملة!";
-        result.style.color = "lime";
-        coins += bet * 2;
-        document.getElementById("coinCount").textContent = coins;
-        document.getElementById("winSound").play();
-      } else {
-        s1 = symbols[Math.floor(Math.random() * symbols.length)];
-        s2 = symbols[Math.floor(Math.random() * symbols.length)];
-        s3 = symbols[Math.floor(Math.random() * symbols.length)];
-        result.textContent = "😢 لم تربح هذه المرة.";
-        result.style.color = "red";
-        document.getElementById("loseSound").play();
-      }
-
-      slot1.textContent = s1;
-      slot2.textContent = s2;
-      slot3.textContent = s3;
-    }
-
-    function resetGame() {
-      coins = 100;
-      document.getElementById("coinCount").textContent = coins;
-      document.getElementById("result").textContent = "✅ تم إعادة اللعبة!";
-      document.getElementById("result").style.color = "white";
-    }
-  </script>
 </body>
 </html>
