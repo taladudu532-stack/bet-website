@@ -2,70 +2,37 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <title>📝 TalaBet Registration</title>
+  <title>📝 Register</title>
   <style>
-    body {
-      font-family: Arial, sans-serif;
-      background: #b30000;
-      color: white;
-      text-align: center;
-      padding: 50px;
-    }
-    input {
-      padding: 10px;
-      margin: 10px;
-      width: 250px;
-      border: none;
-      border-radius: 5px;
-    }
-    button {
-      padding: 10px 20px;
-      background: white;
-      color: #b30000;
-      font-weight: bold;
-      border: none;
-      border-radius: 5px;
-      cursor: pointer;
-    }
-    button:hover {
-      background: #ffcccc;
-    }
-    #status {
-      margin-top: 20px;
-      font-weight: bold;
-    }
+    body { font-family: Arial; background: #b30000; color: white; text-align: center; padding: 50px; }
+    input, button { padding: 10px; margin: 10px; width: 250px; border-radius: 5px; border: none; }
+    button { background: white; color: #b30000; font-weight: bold; cursor: pointer; }
+    button:hover { background: #ffcccc; }
   </style>
 </head>
 <body>
-  <h1>📝 Register New User</h1>
+  <h1>📝 Create Account</h1>
   <input type="text" id="username" placeholder="Username"><br>
+  <input type="email" id="email" placeholder="Email"><br>
   <input type="password" id="password" placeholder="Password"><br>
-  <input type="number" id="coins" placeholder="Starting Coins"><br>
-  <button onclick="registerUser()">Register</button>
+  <button onclick="register()">Register</button>
   <p id="status"></p>
+  <a href="login.html" style="color:white;">Already have an account? Login</a>
 
   <script src="https://www.gstatic.com/firebasejs/10.5.0/firebase-app-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/10.5.0/firebase-firestore-compat.js"></script>
   <script>
-    const firebaseConfig = {
-      apiKey: "AIzaSyASQomgcUm0LNNM8ABYxq-vqz7BYpO-eg4",
-      authDomain: "talabet-89fce.firebaseapp.com",
-      projectId: "talabet-89fce",
-      storageBucket: "talabet-89fce.firebasestorage.app",
-      messagingSenderId: "767205554053",
-      appId: "1:767205554053:web:32cc62707e62aca28b76ec",
-      measurementId: "G-FKLT279RDX"
-    };
+    const firebaseConfig = { /* your config */ };
     firebase.initializeApp(firebaseConfig);
     const db = firebase.firestore();
 
-    async function registerUser() {
+    async function register() {
       const username = document.getElementById("username").value.trim();
+      const email = document.getElementById("email").value.trim();
       const password = document.getElementById("password").value.trim();
-      const coins = parseInt(document.getElementById("coins").value);
 
-      if (!username || !password || isNaN(coins)) {
-        document.getElementById("status").innerText = "❌ Fill all fields correctly.";
+      if (!username || !email || !password) {
+        document.getElementById("status").innerText = "❌ Fill all fields.";
         return;
       }
 
@@ -75,7 +42,7 @@
         return;
       }
 
-      await db.collection("users").doc(username).set({ password, coins });
+      await db.collection("users").doc(username).set({ email, password, coins: 0 });
       localStorage.setItem("username", username);
       document.getElementById("status").innerText = `✅ Registered as ${username}.`;
     }
